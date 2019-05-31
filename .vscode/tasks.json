@@ -1,0 +1,191 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "ninja",
+            "args": [
+                "-j 20"
+            ],
+            "options": {
+                "cwd": "${workspaceRoot}/cpp/build",
+                "env": {
+                    "PARALLEL_LEVEL": "20"
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}/cpp/build"
+                ],
+                "pattern": {
+                    "regexp": "^(.*)\\((\\d+)\\):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "severity": 3,
+                    "message": 4
+                }
+            }
+        },
+        {
+            "label": "build parallel",
+            "command": "ninja",
+            "args": [
+                "-j ${input:numthreads}"
+            ],
+            "options": {
+                "cwd": "${workspaceRoot}/cpp/build",
+                "env": {
+                    "PARALLEL_LEVEL": "${input:numthreads}"
+                }
+            },
+            "group": "kind",
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}/cpp/build"
+                ],
+                "pattern": {
+                    "regexp": "^(.*)\\((\\d+)\\):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "severity": 3,
+                    "message": 4
+                }
+            }
+        },
+        {
+            "label": "build debug",
+            "command": "ninja",
+            "args": [
+                "-j 20"
+            ],
+            "options": {
+                "cwd": "${workspaceRoot}/cpp/Debug",
+                "env": {
+                    "PARALLEL_LEVEL": "20"
+                }
+            },
+            "group": "build",
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}/cpp/Debug"
+                ],
+                "pattern": {
+                    "regexp": "^(.*)\\((\\d+)\\):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "severity": 3,
+                    "message": 4
+                }
+            }
+        },
+        {
+            "label": "build debug parallel",
+            "command": "ninja",
+            "args": [
+                "-j ${input:numthreads}"
+            ],
+            "options": {
+                "cwd": "${workspaceRoot}/cpp/Debug",
+                "env": {
+                    "PARALLEL_LEVEL": "${input:numthreads}"
+                }
+            },
+            "group": "build",
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}/cpp/Debug"
+                ],
+                "pattern": {
+                    "regexp": "^(.*)\\((\\d+)\\):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "severity": 3,
+                    "message": 4
+                }
+            }
+        },
+        {
+            "label": "build cython",
+            "command": "python",
+            "args": [
+                "setup.py",
+                "build_ext",
+                "--inplace",
+                "--library-dir=../cpp/build"
+            ],
+            "options": {
+                "cwd": "${workspaceRoot}/python"
+            },
+            "group": "build",
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}/python"
+                ],
+                "pattern": {
+                    "regexp": "^(.*)\\((\\d+)\\):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "severity": 3,
+                    "message": 4
+                }
+            }
+        },
+        {
+            "label": "Run gtests",
+            "type": "shell",
+            "command": "ninja test",
+            "options": {
+                "cwd": "${workspaceRoot}/cpp/build"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Run pytests",
+            "type": "shell",
+            "command": "pytest",
+            "options": {
+                "cwd": "${workspaceRoot}/python",
+                "env": {
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/cpp/build:/usr/local/cuda/lib64",
+                    "PYTHONPATH": "${workspaceRoot}/python:${workspaceRoot}/cpp/build/python"
+                }
+            },
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "numthreads",
+            "description": "Number of threads to build with",
+            "default": "1",
+            "type": "promptString"
+        },
+    ]
+}
